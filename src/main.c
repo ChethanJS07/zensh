@@ -1,3 +1,5 @@
+#include <asm-generic/errno-base.h>
+#include <errno.h>
 #include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -77,8 +79,14 @@ void exec_external(char *command, char *args) {
 
   if (pid == 0) {
     execvp(command, argv);
-    perror(command);
-    exit(1);
+    // generally we just print perror(command) for posix style
+    if (errno == ENOENT) {
+      fprintf(stderr, "%s: command not found\n", command);
+      exit(127);
+    } else {
+      perror(command);
+      exit(1);
+    }
   } else if (pid > 0) {
     waitpid(pid, NULL, 0);
   } else {
@@ -134,7 +142,7 @@ int main(int argc, char *argv[]) {
       }
       continue;
     } else {
-      exec_external(command, saveptr); 
+      exec_external(command, saveptr);
     }
   }
 
