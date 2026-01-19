@@ -1,30 +1,49 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+
+char *getCommand(char *input) {
+  return strtok(input, " ");
+}
+
+char *getCommandArg(char *input){
+  return strtok(NULL, "\0");
+}
+
+void echo(char *string) {
+  if (string != NULL && *string != '\0') {
+    printf("%s\n", string);
+  }
+}
 
 int main(int argc, char *argv[]) {
   // Flush after every printf
   setbuf(stdout, NULL);
 
-  while(1){
+  while (1) {
     printf("$ ");
     char input[1024];
-    char command[20];
     fgets(input, sizeof(input), stdin);
-    input[strcspn(input, "\n")]='\0';
-    if(strcmp(input, "exit")==0){
+
+    input[strcspn(input, "\n")] = '\0';
+
+    // empty input
+    if(strlen(input)==0){
+      continue;
+    }
+
+    // exit command
+    if (strcmp(input, "exit") == 0) {
       break;
     }
-    char *token = strtok(input, " ");
-    if(token!=NULL){
-      strcpy(command, token);
-    }
-    if(strcmp(command, "echo")==0){
-      char *printText = strtok(NULL, "\0"); 
-      if(printText!=NULL){
-        printf("%s\n", printText);
-      } 
-    } else{
+
+    // get the command
+    char *command = getCommand(input);
+    char *command_arg = getCommandArg(input);
+
+    // echo command
+    if (strcmp(command, "echo") == 0) {
+      echo(command_arg);
+    } else {
       printf("%s: command not found\n", input);
     }
   }
