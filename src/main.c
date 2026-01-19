@@ -139,6 +139,10 @@ int tokenize(const char *input, char **argv, int arg_max) {
         state = STATE_IN_SINGLE_QUOTE;
       } else if (c == '\"') {
         state = STATE_IN_DOUBLE_QUOTE;
+      } else if (c == '\\') {
+        if (input[i + 1] != '\0') {
+          token[tlen++] = input[++i];
+        }
       } else {
         token[tlen++] = c;
       }
@@ -151,11 +155,18 @@ int tokenize(const char *input, char **argv, int arg_max) {
     } else if (state == STATE_IN_DOUBLE_QUOTE) {
       if (c == '\"') {
         state = STATE_NORMAL;
+      } else if (c == '\\') {
+        if (input[i + 1] == '\"' || input[i + 1] == '\\') {
+          token[tlen++] = input[++i];
+        } else {
+          token[tlen++] = c;
+        }
       } else {
         token[tlen++] = c;
       }
     }
   }
+
   if (tlen > 0) {
     token[tlen] = '\0';
     if (argc < arg_max - 1) {
