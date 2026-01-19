@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
   setbuf(stdout, NULL);
 
   while (1) {
-    printf("🧘‍♂️ ");
+    printf("$ ");
     char input[1024];
 
     if (fgets(input, sizeof(input), stdin) == NULL) {
