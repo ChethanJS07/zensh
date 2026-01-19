@@ -8,13 +8,25 @@ int main(int argc, char *argv[]) {
 
   while(1){
     printf("$ ");
-    char command[1024];
-    fgets(command, sizeof(command), stdin);
-    command[strcspn(command, "\n")]='\0';
-    if(strcmp(command, "exit")==0){
+    char input[1024];
+    char command[20];
+    fgets(input, sizeof(input), stdin);
+    input[strcspn(input, "\n")]='\0';
+    if(strcmp(input, "exit")==0){
       break;
     }
-    printf("%s: command not found\n", command);
+    char *token = strtok(input, " ");
+    if(token!=NULL){
+      strcpy(command, token);
+    }
+    if(strcmp(command, "echo")==0){
+      char *printText = strtok(NULL, "\0"); 
+      if(printText!=NULL){
+        printf("%s\n", printText);
+      } 
+    } else{
+      printf("%s: command not found\n", input);
+    }
   }
 
   return 0;
