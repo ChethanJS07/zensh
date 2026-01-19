@@ -7,53 +7,46 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-
 void clear_screen() { printf("\033[2J\033[H"); }
 
-void echo(char *string) {
-  if (string != NULL && *string != '\0') {
-    printf("%s\n", string);
-  }
-}
-
-int cd(char *args){
+int cd(char *args) {
   char *path;
   char expanded[PATH_MAX];
 
-  if(args == NULL || strlen(args)==0){
+  if (args == NULL || strlen(args) == 0) {
     path = getenv("HOME");
-    if(path == NULL){
-      fprintf(stderr, "cd: HOME not set\n");
-      return 1;
-    } 
-  } else if(strcmp(args, "~")==0){
-    path = getenv("HOME");
-    if(path == NULL){
+    if (path == NULL) {
       fprintf(stderr, "cd: HOME not set\n");
       return 1;
     }
-  } else if(args[0]=='~' && args[1]=='/'){
+  } else if (strcmp(args, "~") == 0) {
+    path = getenv("HOME");
+    if (path == NULL) {
+      fprintf(stderr, "cd: HOME not set\n");
+      return 1;
+    }
+  } else if (args[0] == '~' && args[1] == '/') {
     char *home = getenv("HOME");
-    if(home==NULL){
+    if (home == NULL) {
       fprintf(stderr, "cd: HOME not set\n");
       return 1;
     }
-    snprintf(expanded, sizeof(expanded), "%s/%s", home, args+2);
+    snprintf(expanded, sizeof(expanded), "%s/%s", home, args + 2);
     path = expanded;
   } else {
-      path = args;
+    path = args;
   }
 
-  if(chdir(path)!=0){
-    fprintf(stderr, "cd: %s: %s\n", path, strerror(errno)); 
+  if (chdir(path) != 0) {
+    fprintf(stderr, "cd: %s: %s\n", path, strerror(errno));
     return 1;
-  } 
+  }
   return 0;
 }
 
-int pwd(char *args){
+int pwd(char *args) {
   char cwd[PATH_MAX];
-  if(getcwd(cwd, sizeof(cwd))!=NULL){
+  if (getcwd(cwd, sizeof(cwd)) != NULL) {
     printf("%s\n", cwd);
   } else {
     perror("pwd");
@@ -63,9 +56,9 @@ int pwd(char *args){
 }
 
 void type(char *string) {
-  const char *builtins[4] = {"echo", "exit", "type", "pwd"};
+  const char *builtins[5] = {"echo", "exit", "type", "pwd", "cd"};
 
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 5; i++) {
     if (strcmp(string, builtins[i]) == 0) {
       printf("%s is a shell builtin\n", string);
       return;
@@ -101,34 +94,16 @@ void type(char *string) {
   printf("%s: not found\n", string);
 }
 
-void exec_external(char *command, char *args) {
-  char *argv[64];
-  int argc = 0;
-
-  argv[argc++] = command;
-
-  if (args != NULL) {
-    char *saveptr;
-    char *arg = strtok_r(args, " ", &saveptr);
-
-    while (arg != NULL && argc < 63) {
-      argv[argc++] = arg;
-      arg = strtok_r(NULL, " ", &saveptr);
-    }
-  }
-
-  argv[argc] = NULL;
-
+void exec_external(char **argv) {
   pid_t pid = fork();
 
   if (pid == 0) {
-    execvp(command, argv);
-    // generally we just print perror(command) for posix style
+    execvp(argv[0], argv);
     if (errno == ENOENT) {
-      fprintf(stderr, "%s: command not found\n", command);
+      fprintf(stderr, "%s: command not found\n", argv[0]);
       exit(127);
     } else {
-      perror(command);
+      perror(argv[0]);
       exit(1);
     }
   } else if (pid > 0) {
@@ -138,14 +113,59 @@ void exec_external(char *command, char *args) {
   }
 }
 
+int tokenize(const char *input, char **argv, int arg_max) {
+  int argc = 0;
+  char token[1024];
+  int tlen = 0;
+
+  enum { STATE_NORMAL, STATE_IN_SINGLE_QUOTE } state = STATE_NORMAL;
+
+  for (int i = 0; input[i] != '\0'; i++) {
+    char c = input[i];
+    if (state == STATE_NORMAL) {
+      if (c == ' ') {
+        if (tlen > 0) {
+          token[tlen] = '\0';
+          if (argc < arg_max - 1) {
+            argv[argc++] = strdup(token);
+          }
+          tlen = 0;
+        }
+      } else if (c == '\'') {
+        state = STATE_IN_SINGLE_QUOTE;
+      } else {
+        token[tlen++] = c;
+      }
+    } else if (state == STATE_IN_SINGLE_QUOTE) {
+      if (c == '\'') {
+        state = STATE_NORMAL;
+      } else {
+        token[tlen++] = c;
+      }
+    }
+  }
+  if (tlen > 0) {
+    token[tlen] = '\0';
+    if (argc < arg_max - 1) {
+      argv[argc++] = strdup(token);
+    }
+  }
+  argv[argc] = NULL;
+
+  return argc;
+}
+
 int main(int argc, char *argv[]) {
   // Flush after every printf
   setbuf(stdout, NULL);
 
   while (1) {
-    printf("$ ");
+    printf("🧘‍♂️ ");
     char input[1024];
-    fgets(input, sizeof(input), stdin);
+
+    if (fgets(input, sizeof(input), stdin) == NULL) {
+      break;
+    }
 
     input[strcspn(input, "\n")] = '\0';
 
@@ -154,48 +174,47 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
+    char *cmd_argv[64];
+    int cmd_argc = tokenize(input, cmd_argv, 64);
+
+    if (cmd_argc == 0) {
+      continue;
+    }
+
     // exit command
-    if (strcmp(input, "exit") == 0) {
+    if (strcmp(cmd_argv[0], "exit") == 0) {
       break;
     }
 
-    if (strcmp(input, "clear") == 0) {
+    // clear command
+    if (strcmp(cmd_argv[0], "clear") == 0) {
       clear_screen();
       continue;
     }
 
-    // get the command
-    char *saveptr;
-    char *command = strtok_r(input, " ", &saveptr);
-    if (command == NULL) {
-      continue;
+    // echo command
+    if (strcmp(cmd_argv[0], "echo") == 0) {
+      for (int i = 1; i < cmd_argc; i++) {
+        if (i > 1) {
+          printf(" ");
+        }
+        printf("%s", cmd_argv[i]);
+      }
+      printf("\n");
+    } else if (strcmp(cmd_argv[0], "type") == 0) {
+      for (int i = 1; i < cmd_argc; i++) {
+        type(cmd_argv[i]);
+      }
+    } else if (strcmp(cmd_argv[0], "pwd") == 0) {
+      pwd(cmd_argv[1]);
+    } else if (strcmp(cmd_argv[0], "cd") == 0) {
+      cd(cmd_argv[1]);
+    } else {
+      exec_external(cmd_argv);
     }
 
-    // echo command
-    if (strcmp(command, "echo") == 0) {
-      char *args = saveptr;
-      echo(args);
-      continue;
-    } else if (strcmp(command, "type") == 0) {
-      char *arg;
-      char *arg_saveptr;
-      arg = strtok_r(saveptr, " ", &arg_saveptr);
-
-      while (arg != NULL) {
-        type(arg);
-        arg = strtok_r(NULL, " ", &arg_saveptr);
-      }
-      continue;
-    } else if(strcmp(command, "pwd")==0) {
-      char *args = saveptr;
-      pwd(args);
-      continue;
-    } else if(strcmp(command, "cd")==0){
-      char *args = saveptr;
-      cd(args);
-    } 
-    else {
-      exec_external(command, saveptr);
+    for (int i = 0; i < cmd_argc; i++) {
+      free(cmd_argv[i]);
     }
   }
 
