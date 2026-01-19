@@ -1,4 +1,3 @@
-#include <asm-generic/errno-base.h>
 #include <errno.h>
 #include <linux/limits.h>
 #include <stdio.h>
@@ -8,7 +7,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#define NUM_BUILTINS 3
 
 void clear_screen() { printf("\033[2J\033[H"); }
 
@@ -18,10 +16,21 @@ void echo(char *string) {
   }
 }
 
-void type(char *string) {
-  const char *builtins[NUM_BUILTINS] = {"echo", "exit", "type"};
+int pwd(char *args){
+  char cwd[PATH_MAX];
+  if(getcwd(cwd, sizeof(cwd))!=NULL){
+    printf("%s\n", cwd);
+  } else {
+    perror("pwd");
+    return 1;
+  }
+  return 0;
+}
 
-  for (int i = 0; i < NUM_BUILTINS; i++) {
+void type(char *string) {
+  const char *builtins[4] = {"echo", "exit", "type", "pwd"};
+
+  for (int i = 0; i < 4; i++) {
     if (strcmp(string, builtins[i]) == 0) {
       printf("%s is a shell builtin\n", string);
       return;
@@ -131,6 +140,7 @@ int main(int argc, char *argv[]) {
     if (strcmp(command, "echo") == 0) {
       char *args = saveptr;
       echo(args);
+      continue;
     } else if (strcmp(command, "type") == 0) {
       char *arg;
       char *arg_saveptr;
@@ -140,6 +150,10 @@ int main(int argc, char *argv[]) {
         type(arg);
         arg = strtok_r(NULL, " ", &arg_saveptr);
       }
+      continue;
+    } else if(strcmp(command, "pwd")==0) {
+      char *args = saveptr;
+      pwd(args);
       continue;
     } else {
       exec_external(command, saveptr);
