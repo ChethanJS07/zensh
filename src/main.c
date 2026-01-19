@@ -118,7 +118,11 @@ int tokenize(const char *input, char **argv, int arg_max) {
   char token[1024];
   int tlen = 0;
 
-  enum { STATE_NORMAL, STATE_IN_SINGLE_QUOTE } state = STATE_NORMAL;
+  enum {
+    STATE_NORMAL,
+    STATE_IN_SINGLE_QUOTE,
+    STATE_IN_DOUBLE_QUOTE
+  } state = STATE_NORMAL;
 
   for (int i = 0; input[i] != '\0'; i++) {
     char c = input[i];
@@ -133,11 +137,19 @@ int tokenize(const char *input, char **argv, int arg_max) {
         }
       } else if (c == '\'') {
         state = STATE_IN_SINGLE_QUOTE;
+      } else if (c == '\"') {
+        state = STATE_IN_DOUBLE_QUOTE;
       } else {
         token[tlen++] = c;
       }
     } else if (state == STATE_IN_SINGLE_QUOTE) {
       if (c == '\'') {
+        state = STATE_NORMAL;
+      } else {
+        token[tlen++] = c;
+      }
+    } else if (state == STATE_IN_DOUBLE_QUOTE) {
+      if (c == '\"') {
         state = STATE_NORMAL;
       } else {
         token[tlen++] = c;
