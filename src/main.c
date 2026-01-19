@@ -16,6 +16,25 @@ void echo(char *string) {
   }
 }
 
+int cd(char *args){
+  char *path;
+  if(args == NULL || strlen(args)==0){
+    path = getenv("HOME");
+    if(path == NULL){
+      fprintf(stderr, "cd: HOME not set\n");
+      return 1;
+    } 
+  } else {
+      path = args;
+  }
+
+  if(chdir(path)!=0){
+    fprintf(stderr, "cd: %s: %s\n", path, strerror(errno)); 
+    return 1;
+  } 
+  return 0;
+}
+
 int pwd(char *args){
   char cwd[PATH_MAX];
   if(getcwd(cwd, sizeof(cwd))!=NULL){
@@ -155,7 +174,11 @@ int main(int argc, char *argv[]) {
       char *args = saveptr;
       pwd(args);
       continue;
-    } else {
+    } else if(strcmp(command, "cd")==0){
+      char *args = saveptr;
+      cd(args);
+    } 
+    else {
       exec_external(command, saveptr);
     }
   }
