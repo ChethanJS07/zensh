@@ -18,12 +18,28 @@ void echo(char *string) {
 
 int cd(char *args){
   char *path;
+  char expanded[PATH_MAX];
+
   if(args == NULL || strlen(args)==0){
     path = getenv("HOME");
     if(path == NULL){
       fprintf(stderr, "cd: HOME not set\n");
       return 1;
     } 
+  } else if(strcmp(args, "~")==0){
+    path = getenv("HOME");
+    if(path == NULL){
+      fprintf(stderr, "cd: HOME not set\n");
+      return 1;
+    }
+  } else if(args[0]=='~' && args[1]=='/'){
+    char *home = getenv("HOME");
+    if(home==NULL){
+      fprintf(stderr, "cd: HOME not set\n");
+      return 1;
+    }
+    snprintf(expanded, sizeof(expanded), "%s/%s", home, args+2);
+    path = expanded;
   } else {
       path = args;
   }
