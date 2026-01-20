@@ -1,5 +1,6 @@
 #include "zensh.h"
 #include <stdlib.h>
+#include <unistd.h>
 
 int main(void) {
   setbuf(stdout, NULL);
@@ -16,6 +17,13 @@ int main(void) {
 
     while (1) {
       char c = read_char();
+
+      if (c == '\x1b') {
+        char seq[2];
+        read(STDIN_FILENO, &seq[0], 1);
+        read(STDIN_FILENO, &seq[1], 1);
+        continue;
+      }
 
       if (c == '\n' || c == '\r') {
         input[len] = '\0';
