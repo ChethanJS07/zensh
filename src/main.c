@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <fcntl.h>
 #include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -94,10 +95,49 @@ void type(char *string) {
   printf("%s: not found\n", string);
 }
 
+int redir(char **argv) {
+  for (int i = 0; argv[i] != NULL; i++) {
+    int fd_target = -1;
+    if (strcmp(argv[i], ">") == 0) {
+      fd_target = STDOUT_FILENO;
+    } else if (argv[i][0] >= '0' && argv[i][0] <= '9' && argv[i][1] == '>' &&
+               argv[i][2] == '\0') {
+      fd_target = argv[i][0] - '0';
+    }
+
+    if (fd_target != -1) {
+      if (argv[i + 1] == NULL) {
+        fprintf(stderr, "syntax error: expected filename after '>'\n");
+        return -1;
+      }
+      int fd = open(argv[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+      if (fd < 0) {
+        perror(argv[i + 1]);
+        return -1;
+      }
+
+      dup2(fd, fd_target);
+      close(fd);
+
+      int j;
+      for (j = i; argv[j + 2] != NULL; j++) {
+        argv[j] = argv[j + 2];
+      }
+
+      argv[j] = NULL;
+      i--;
+    }
+  }
+  return 0;
+}
+
 void exec_external(char **argv) {
   pid_t pid = fork();
 
   if (pid == 0) {
+    if (redir(argv) < 0) {
+      exit(1);
+    }
     execvp(argv[0], argv);
     if (errno == ENOENT) {
       fprintf(stderr, "%s: command not found\n", argv[0]);
@@ -217,13 +257,23 @@ int main(int argc, char *argv[]) {
 
     // echo command
     if (strcmp(cmd_argv[0], "echo") == 0) {
-      for (int i = 1; i < cmd_argc; i++) {
+      int saved_stdout = dup(STDOUT_FILENO);
+      if (redir(cmd_argv) < 0) {
+        dup2(saved_stdout, STDOUT_FILENO);
+        close(saved_stdout);
+        continue;
+      }
+      for (int i = 1; cmd_argv[i] != NULL; i++) {
         if (i > 1) {
           printf(" ");
         }
         printf("%s", cmd_argv[i]);
       }
       printf("\n");
+
+      dup2(saved_stdout, STDOUT_FILENO);
+      close(saved_stdout);
+      continue;
     } else if (strcmp(cmd_argv[0], "type") == 0) {
       for (int i = 1; i < cmd_argc; i++) {
         type(cmd_argv[i]);
