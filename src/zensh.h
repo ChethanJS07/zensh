@@ -3,10 +3,13 @@
 
 #pragma once
 
+
+#include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <linux/limits.h>
-#include <stdio.h>
+#include <readline/history.h>
+#include <readline/readline.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -18,11 +21,9 @@
 
 int tokenize(const char *input, char **argv, int arg_max);
 int autocomplete(char *buffer, size_t bufsize, size_t *cursor);
-char read_char();
 
-/* Terminal */
-void enable_raw_mode(void);
-void disable_raw_mode(void);
+char **zensh_completion(const char *text, int start, int end);
+char *command_generator(const char *text, int state);
 
 int cd(char *args);
 int pwd(char *args);

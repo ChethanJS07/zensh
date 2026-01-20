@@ -1,63 +1,26 @@
 #include "zensh.h"
-#include <stdlib.h>
-#include <unistd.h>
+#include <readline/readline.h>
+
+extern char **zensh_completion(const char *text, int start, int end);
 
 int main(void) {
   setbuf(stdout, NULL);
-
-  enable_raw_mode();
-  atexit(disable_raw_mode);
+  rl_attempted_completion_function = zensh_completion;
 
   while (1) {
-    printf("$ ");
-
-    char input[MAX_LINE];
-    size_t len = 0;
-    size_t cursor = 0;
-
-    while (1) {
-      char c = read_char();
-
-      if (c == '\x1b') {
-        char seq[2];
-        read(STDIN_FILENO, &seq[0], 1);
-        read(STDIN_FILENO, &seq[1], 1);
-        continue;
-      }
-
-      if (c == '\n' || c == '\r') {
-        input[len] = '\0';
-        putchar('\n');
-        break;
-      }
-
-      if (c == 127 || c == '\b') { // backspace
-        if (len > 0) {
-          len--;
-          cursor--;
-          printf("\b \b");
-        }
-        continue;
-      }
-
-      if (c == '\t') {
-        autocomplete(input, sizeof(input), &cursor);
-        len = cursor;
-        continue;
-      }
-
-      if (len < MAX_LINE - 1) {
-        input[len++] = c;
-        cursor++;
-        putchar(c);
-      }
+    char *line = readline("$ ");
+    if (!line) {
+      break; // Ctrl+D
     }
-    if (*input == '\0') {
-      continue;
+
+    if (*line) {
+      add_history(line);
     }
 
     char *argv[MAX_ARGS];
-    int argc = tokenize(input, argv, MAX_ARGS);
+    int argc = tokenize(line, argv, MAX_ARGS);
+    free(line);
+
     if (argc == 0) {
       continue;
     }

@@ -1,5 +1,4 @@
 #include "zensh.h"
-#include <linux/limits.h>
 
 int cd(char *args) {
   char *path;
