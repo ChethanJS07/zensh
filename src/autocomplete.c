@@ -19,12 +19,18 @@ int autocomplete(char *buffer, size_t bufsize, size_t *cursor) {
     if (strncmp(builtins[i], buffer + start, prefix_len) == 0) {
       size_t remaining = strlen(builtins[i]) - prefix_len;
 
-      if (len + remaining >= bufsize) {
+      if (len + remaining + 2 >= bufsize) {
         return 0;
       }
       strcpy(buffer + len, builtins[i] + prefix_len);
       fputs(builtins[i] + prefix_len, stdout);
       *cursor += remaining;
+      if (*cursor == start + strlen(builtins[i])) {
+        buffer[*cursor] = ' ';
+        buffer[*cursor + 1] = '\0';
+        putchar(' ');
+        (*cursor)++;
+      }
       return 1;
     }
   }
