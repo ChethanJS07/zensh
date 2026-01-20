@@ -40,7 +40,7 @@ char *command_generator(const char *text, int state) {
     }
   }
 
-  /* while (path) {
+  while (path) {
     if (!dir) {
       dir = opendir(path);
       if (!dir) {
@@ -66,7 +66,7 @@ char *command_generator(const char *text, int state) {
     closedir(dir);
     dir = NULL;
     path = strtok_r(NULL, ":", &saveptr);
-  } */
+  }
 
   return NULL;
 }
