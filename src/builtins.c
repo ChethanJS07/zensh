@@ -83,39 +83,54 @@ void type(char *args) {
   printf("%s: not found\n", args);
 }
 
-void builtin_history(int argc, char **argv) {
-  HIST_ENTRY **list = history_list();
-  if (!list)
-    return;
+int builtin_history(int argc, char **argv) {
+  // history
+  if (argc == 1) {
+    HIST_ENTRY **list = history_list();
+    if (!list) return 0;
 
-  int total = history_length;
-  int start = 0;
-
-  if (argc == 2) {
-    for (char *p = argv[1]; *p; p++) {
-      if (!isdigit(*p)) {
-        fprintf(stderr, "history: %s: numeric argument required\n", argv[1]);
-        return;
-      }
+    for (int i = 0; list[i]; i++) {
+      printf("%5d  %s\n", i + history_base, list[i]->line);
     }
+    return 0;
+  }
 
+  // history N
+  if (argc == 2 && isdigit(argv[1][0])) {
     int n = atoi(argv[1]);
-    if (n <= 0) {
-      fprintf(stderr, "history: %s: invalid number\n", argv[1]);
-      return;
-    }
+    HIST_ENTRY **list = history_list();
+    if (!list) return 0;
 
-    if (n < total) {
-      start = total - n;
+    int len = history_length;
+    int start = len - n;
+    if (start < 0) start = 0;
+
+    for (int i = start; i < len; i++) {
+      printf("%5d  %s\n", i + history_base, list[i]->line);
     }
-  } else if (argc > 2) {
-    fprintf(stderr, "history: too many arguments\n");
-    return;
+    return 0;
   }
 
-  for (int i = start; i < total; i++) {
-    printf("%5d  %s\n", i + 1, list[i]->line);
+  // history -r FILE
+  if (argc == 3 && strcmp(argv[1], "-r") == 0) {
+    if (read_history(argv[2]) != 0) {
+      perror("history");
+      return 1;
+    }
+    return 0;
   }
+
+  // Optional (future-proof)
+  if (argc == 3 && strcmp(argv[1], "-w") == 0) {
+    if (write_history(argv[2]) != 0) {
+      perror("history");
+      return 1;
+    }
+    return 0;
+  }
+
+  fprintf(stderr, "history: invalid arguments\n");
+  return 1;
 }
 
 char *get_history_path(void) {
