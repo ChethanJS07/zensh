@@ -2,8 +2,8 @@
 #include <dirent.h>
 #include <limits.h>
 
-static const char *builtins[] = {"echo", "exit",  "type", "pwd",
-                                 "cd",   "clear", NULL};
+static const char *builtins[] = {"echo", "exit",  "type",    "pwd",
+                                 "cd",   "clear", "history", NULL};
 
 char *command_generator(const char *text, int state) {
   static int builtin_index;

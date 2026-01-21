@@ -47,8 +47,8 @@ int pwd(char *args) {
 }
 
 void type(char *args) {
-  const char *builtins[5] = {"echo", "exit", "type", "pwd", "cd"};
-  for (int i = 0; i < 5; i++) {
+  const char *builtins[6] = {"echo", "exit", "type", "pwd", "cd", "history"};
+  for (int i = 0; i < 6; i++) {
     if (strcmp(args, builtins[i]) == 0) {
       printf("%s is a shell builtin\n", args);
       return;
@@ -78,4 +78,14 @@ void type(char *args) {
     dir = strtok_r(NULL, ":", &saveptr);
   }
   printf("%s: not found\n", args);
+}
+
+void history() {
+  HIST_ENTRY **list = history_list();
+  if (!list)
+    return;
+
+  for (int i = 0; list[i]; i++) {
+    printf("%5d  %s\n", i + 1, list[i]->line);
+  }
 }
