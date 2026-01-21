@@ -143,13 +143,14 @@ int builtin_history(int argc, char **argv) {
   // history -a FILE
   if (argc == 3 && strcmp(argv[1], "-a") == 0) {
     int new_entries = history_length - history_session_start;
-    if (new_entries <= 0) {
-      return 0;
-    }
 
-    if (append_history(new_entries, argv[2]) != 0) {
-      perror("history");
-      return 1;
+    if (new_entries > 0) {
+      if (append_history(new_entries, argv[2]) != 0) {
+        perror("history");
+        return 1;
+      }
+
+      history_session_start = history_length;
     }
     return 0;
   }
