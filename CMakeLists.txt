@@ -12,6 +12,8 @@ add_executable(zensh ${SRC_FILES})
 target_link_libraries(zensh PRIVATE readline)
 
 install(TARGETS zensh
-  RUNTIME DESTINATION bin
-)
+        RUNTIME DESTINATION bin)
+
+install(FILES man/zensh.1
+        DESTINATION share/man/man1)
 

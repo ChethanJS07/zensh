@@ -45,7 +45,7 @@ int cd(char *args) {
 void whobuiltyou() {
   printf("\033[1;36mBuilt by Chethan\033[0m\n");
   printf("\033[1;34mGitHub:\033[0m https://github.com/imchethanjs\n");
-  printf("Version: zensh %s\n", ZENSH_VERSION);
+  printf("\033[1;34mVersion:\033[0m zensh %s\n", ZENSH_VERSION);
 }
 
 int pwd(char *args) {
