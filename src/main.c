@@ -34,6 +34,19 @@ int main(void) {
       goto cleanup;
     }
 
+    int has_pipe = 0;
+    for (int i = 0; argv[i]; i++) {
+      if (strcmp(argv[i], "|") == 0) {
+        has_pipe = 1;
+        break;
+      }
+    }
+
+    if (has_pipe) {
+      exec_pipeline(argv);
+      goto cleanup;
+    }
+
     if (strcmp(argv[0], "echo") == 0) {
       int saved = dup(STDOUT_FILENO);
       if (redir(argv) == 0) {

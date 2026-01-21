@@ -22,6 +22,8 @@
 int tokenize(const char *input, char **argv, int arg_max);
 int autocomplete(char *buffer, size_t bufsize, size_t *cursor);
 
+int exec_pipeline(char **argv);
+
 char **zensh_completion(const char *text, int start, int end);
 char *command_generator(const char *text, int state);
 
