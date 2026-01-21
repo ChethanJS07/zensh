@@ -1,0 +1,93 @@
+
+.TH ZENSH 1 "2026" "zensh 0.1.0" "User Commands"
+.SH NAME
+zensh \- a small POSIX-style Unix shell
+.SH SYNOPSIS
+.B zensh
+.SH DESCRIPTION
+.B zensh
+is a lightweight Unix shell written in C.
+It supports pipelines, redirection, history, quoting,
+and command autocompletion.
+
+.SH BUILTINS
+.TP
+.B echo
+Print arguments to standard output.
+
+.TP
+.B cd
+Change the current working directory.
+
+.TP
+.B pwd
+Print the current working directory.
+
+.TP
+.B type
+Indicate how a command would be interpreted.
+
+.TP
+.B history
+Display and manage command history.
+
+.TP
+.B clear
+Clear the terminal screen.
+
+.TP
+.B exit
+Exit the shell.
+
+.SH HISTORY
+zensh uses GNU Readline for history management.
+
+Supported commands:
+.TP
+.B history
+Show command history.
+
+.TP
+.B history N
+Show the last N commands.
+
+.TP
+.B history -r FILE
+Read and append history from FILE.
+
+.TP
+.B history -w FILE
+Write history to FILE.
+
+.TP
+.B history -a FILE
+Append current session history to FILE.
+
+.SH FEATURES
+.TP
+- Pipes using |
+.TP
+- Input/output redirection (> >> 2> 2>>)
+.TP
+- Quoting (single, double, backslash)
+.TP
+- Builtin and executable autocompletion
+
+.SH FILES
+.TP
+.B ~/.zensh_history
+Default history file.
+
+.SH ENVIRONMENT
+.TP
+.B HISTFILE
+Path to the history file.
+
+.SH AUTHOR
+Written by Chethan.
+
+.SH LICENSE
+MIT License.
+
+.SH SEE ALSO
+bash(1), sh(1)
