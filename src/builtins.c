@@ -84,33 +84,29 @@ void type(char *args) {
 }
 
 int builtin_history(int argc, char **argv) {
+  HIST_ENTRY **list = history_list();
+  if (!list)
+    return 0;
+
   // history
   if (argc == 1) {
-    HIST_ENTRY **list = history_list();
-    if (!list)
-      return 0;
-
     for (int i = 0; list[i]; i++) {
-      printf("%5d  %s\n", i + history_base, list[i]->line);
+      printf("%5d  %s\n", i + 1, list[i]->line);
     }
     return 0;
   }
 
   // history N
-  if (argc == 2 && isdigit(argv[1][0])) {
+  if (argc == 2 && isdigit((unsigned char)argv[1][0])) {
     int n = atoi(argv[1]);
-    HIST_ENTRY **list = history_list();
-    if (!list)
-      return 0;
-
     int len = history_length;
+
     int start = len - n;
     if (start < 0)
       start = 0;
 
-    int num = 1;
     for (int i = start; i < len; i++) {
-      printf("%5d  %s\n", num++, list[i]->line);
+      printf("%5d  %s\n", i + 1, list[i]->line);
     }
     return 0;
   }
@@ -124,7 +120,7 @@ int builtin_history(int argc, char **argv) {
     return 0;
   }
 
-  // Optional (future-proof)
+  // history -w FILE (optional)
   if (argc == 3 && strcmp(argv[1], "-w") == 0) {
     if (write_history(argv[2]) != 0) {
       perror("history");
@@ -133,8 +129,7 @@ int builtin_history(int argc, char **argv) {
     return 0;
   }
 
-  fprintf(stderr, "history: invalid arguments\n");
-  return 1;
+  return 0;
 }
 
 char *get_history_path(void) {
