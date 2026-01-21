@@ -17,3 +17,5 @@ install(TARGETS zensh
 install(FILES man/zensh.1
         DESTINATION share/man/man1)
 
+install(FILES LICENSE
+        DESTINATION share/licenses/zensh)
