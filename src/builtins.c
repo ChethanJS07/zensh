@@ -1,5 +1,7 @@
 #include "zensh.h"
 #include <ctype.h>
+#include <readline/history.h>
+#include <stdio.h>
 
 extern int history_session_start;
 
@@ -132,6 +134,20 @@ int builtin_history(int argc, char **argv) {
   // history -w FILE
   if (argc == 3 && strcmp(argv[1], "-w") == 0) {
     if (write_history(argv[2]) != 0) {
+      perror("history");
+      return 1;
+    }
+    return 0;
+  }
+
+  // history -a FILE
+  if (argc == 3 && strcmp(argv[1], "-a") == 0) {
+    int new_entries = history_length - history_session_start;
+    if (new_entries <= 0) {
+      return 0;
+    }
+
+    if (append_history(new_entries, argv[2]) != 0) {
       perror("history");
       return 1;
     }
