@@ -19,12 +19,14 @@ int main(void) {
   if (histfile) {
     read_history(histfile);
   }
+
+  history_session_start = history_length;
   atexit(save_history);
 
   while (1) {
     char *line = readline("$ ");
     if (!line) {
-      break; 
+      break;
     }
 
     if (*line) {

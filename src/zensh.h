@@ -3,7 +3,6 @@
 
 #pragma once
 
-
 #include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -22,6 +21,7 @@
 int tokenize(const char *input, char **argv, int arg_max);
 int autocomplete(char *buffer, size_t bufsize, size_t *cursor);
 
+extern int history_session_start;
 int exec_pipeline(char **argv);
 
 char **zensh_completion(const char *text, int start, int end);

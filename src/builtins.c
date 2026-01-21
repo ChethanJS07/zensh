@@ -1,7 +1,9 @@
 #include "zensh.h"
 #include <ctype.h>
-#include <readline/history.h>
-#include <stdio.h>
+
+extern int history_session_start;
+
+int history_session_start = 0;
 
 int cd(char *args) {
   char *path;
@@ -88,10 +90,13 @@ int builtin_history(int argc, char **argv) {
   if (!list)
     return 0;
 
+  int total = history_length;
+
   // history
   if (argc == 1) {
-    for (int i = 0; list[i]; i++) {
-      printf("%5d  %s\n", i + 1, list[i]->line);
+    int num = 1;
+    for (int i = history_session_start; i < total; i++) {
+      printf("%5d  %s\n", num++, list[i]->line);
     }
     return 0;
   }
@@ -99,14 +104,13 @@ int builtin_history(int argc, char **argv) {
   // history N
   if (argc == 2 && isdigit((unsigned char)argv[1][0])) {
     int n = atoi(argv[1]);
-    int len = history_length;
+    int start = total - n;
+    if (start < history_session_start)
+      start = history_session_start;
 
-    int start = len - n;
-    if (start < 0)
-      start = 0;
-
-    for (int i = start; i < len; i++) {
-      printf("%5d  %s\n", i + 1, list[i]->line);
+    int num = 1;
+    for (int i = start; i < total; i++) {
+      printf("%5d  %s\n", num++, list[i]->line);
     }
     return 0;
   }
@@ -120,7 +124,7 @@ int builtin_history(int argc, char **argv) {
     return 0;
   }
 
-  // history -w FILE (optional)
+  // history -w FILE
   if (argc == 3 && strcmp(argv[1], "-w") == 0) {
     if (write_history(argv[2]) != 0) {
       perror("history");
@@ -131,7 +135,6 @@ int builtin_history(int argc, char **argv) {
 
   return 0;
 }
-
 char *get_history_path(void) {
   const char *home = getenv("HOME");
   if (!home)
