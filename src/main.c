@@ -24,7 +24,7 @@ int main(void) {
   while (1) {
     char *line = readline("$ ");
     if (!line) {
-      break; // Ctrl+D
+      break; 
     }
 
     if (*line) {
