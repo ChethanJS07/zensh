@@ -30,9 +30,10 @@ char *command_generator(const char *text, int state);
 int cd(char *args);
 int pwd(char *args);
 void type(char *string);
-void history(int argc, char **argv);
+void builtin_history(int argc, char **argv);
 void exec(char **argv);
 
+char *get_history_path(void);
 int redir(char **argv);
 
 void clear_screen(void);

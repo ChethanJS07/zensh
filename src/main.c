@@ -1,11 +1,25 @@
 #include "zensh.h"
-#include <readline/readline.h>
 
 extern char **zensh_completion(const char *text, int start, int end);
 
+static char *histfile;
+
+static void save_history(void) {
+  if (histfile) {
+    write_history(histfile);
+  }
+}
+
 int main(void) {
   setbuf(stdout, NULL);
+
   rl_attempted_completion_function = zensh_completion;
+
+  histfile = get_history_path();
+  if (histfile) {
+    read_history(histfile);
+  }
+  atexit(save_history);
 
   while (1) {
     char *line = readline("$ ");
@@ -35,7 +49,7 @@ int main(void) {
     }
 
     if (strcmp(argv[0], "history") == 0) {
-      history(argc, argv);
+      builtin_history(argc, argv);
       goto cleanup;
     }
 

@@ -83,7 +83,7 @@ void type(char *args) {
   printf("%s: not found\n", args);
 }
 
-void history(int argc, char **argv) {
+void builtin_history(int argc, char **argv) {
   HIST_ENTRY **list = history_list();
   if (!list)
     return;
@@ -94,7 +94,7 @@ void history(int argc, char **argv) {
   if (argc == 2) {
     for (char *p = argv[1]; *p; p++) {
       if (!isdigit(*p)) {
-        fprintf(stderr, "history: %s: numeric argument required\n");
+        fprintf(stderr, "history: %s: numeric argument required\n", argv[1]);
         return;
       }
     }
@@ -116,4 +116,14 @@ void history(int argc, char **argv) {
   for (int i = start; i < total; i++) {
     printf("%5d  %s\n", i + 1, list[i]->line);
   }
+}
+
+char *get_history_path(void) {
+  const char *home = getenv("HOME");
+  if (!home)
+    return NULL;
+
+  static char path[PATH_MAX];
+  snprintf(path, sizeof(path), "%s/.zensh_history", home);
+  return path;
 }
