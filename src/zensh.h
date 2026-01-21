@@ -30,7 +30,7 @@ char *command_generator(const char *text, int state);
 int cd(char *args);
 int pwd(char *args);
 void type(char *string);
-void history();
+void history(int argc, char **argv);
 void exec(char **argv);
 
 int redir(char **argv);

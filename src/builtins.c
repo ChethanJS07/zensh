@@ -1,4 +1,7 @@
 #include "zensh.h"
+#include <ctype.h>
+#include <readline/history.h>
+#include <stdio.h>
 
 int cd(char *args) {
   char *path;
@@ -80,12 +83,37 @@ void type(char *args) {
   printf("%s: not found\n", args);
 }
 
-void history() {
+void history(int argc, char **argv) {
   HIST_ENTRY **list = history_list();
   if (!list)
     return;
 
-  for (int i = 0; list[i]; i++) {
+  int total = history_length;
+  int start = 0;
+
+  if (argc == 2) {
+    for (char *p = argv[1]; *p; p++) {
+      if (!isdigit(*p)) {
+        fprintf(stderr, "history: %s: numeric argument required\n");
+        return;
+      }
+    }
+
+    int n = atoi(argv[1]);
+    if (n <= 0) {
+      fprintf(stderr, "history: %s: invalid number\n", argv[1]);
+      return;
+    }
+
+    if (n < total) {
+      start = total - n;
+    }
+  } else if (argc > 2) {
+    fprintf(stderr, "history: too many arguments\n");
+    return;
+  }
+
+  for (int i = start; i < total; i++) {
     printf("%5d  %s\n", i + 1, list[i]->line);
   }
 }

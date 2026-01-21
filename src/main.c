@@ -35,7 +35,7 @@ int main(void) {
     }
 
     if (strcmp(argv[0], "history") == 0) {
-      history();
+      history(argc, argv);
       goto cleanup;
     }
 
