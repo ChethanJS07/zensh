@@ -17,13 +17,14 @@
 
 #define MAX_LINE 1024
 #define MAX_ARGS 64
+#define ZENSH_VERSION "0.1.0"
 
 int tokenize(const char *input, char **argv, int arg_max);
 int autocomplete(char *buffer, size_t bufsize, size_t *cursor);
 
 extern int history_session_start;
 int exec_pipeline(char **argv);
-
+void whobuiltyou();
 char **zensh_completion(const char *text, int start, int end);
 char *command_generator(const char *text, int state);
 

@@ -55,6 +55,11 @@ int main(void) {
       goto cleanup;
     }
 
+    if (strcmp(argv[0], "whobuiltyou") == 0) {
+      whobuiltyou();
+      goto cleanup;
+    }
+
     int has_pipe = 0;
     for (int i = 0; argv[i]; i++) {
       if (strcmp(argv[i], "|") == 0) {

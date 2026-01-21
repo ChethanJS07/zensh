@@ -42,6 +42,12 @@ int cd(char *args) {
   return 0;
 }
 
+void whobuiltyou() {
+  printf("\033[1;36mBuilt by Chethan\033[0m\n");
+  printf("\033[1;34mGitHub:\033[0m https://github.com/imchethanjs\n");
+  printf("Version: zensh %s\n", ZENSH_VERSION);
+}
+
 int pwd(char *args) {
   char cwd[PATH_MAX];
   if (getcwd(cwd, sizeof(cwd)) != NULL) {
@@ -54,8 +60,9 @@ int pwd(char *args) {
 }
 
 void type(char *args) {
-  const char *builtins[6] = {"echo", "exit", "type", "pwd", "cd", "history"};
-  for (int i = 0; i < 6; i++) {
+  const char *builtins[7] = {"echo", "whobuiltyou", "exit",   "type",
+                             "pwd",  "cd",          "history"};
+  for (int i = 0; i < 7; i++) {
     if (strcmp(args, builtins[i]) == 0) {
       printf("%s is a shell builtin\n", args);
       return;

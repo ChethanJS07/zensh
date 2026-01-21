@@ -1,0 +1,16 @@
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+Makefile
+
+zensh
+shell
+*.o
+
+.vscode/
+.idea/
+*.swp
+
+.zensh_history
+
