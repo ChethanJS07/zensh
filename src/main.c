@@ -24,7 +24,7 @@ int main(void) {
   atexit(save_history);
 
   while (1) {
-    char *line = readline("$ ");
+    char *line = readline("🧘‍♂️ ");
     if (!line) {
       break;
     }
