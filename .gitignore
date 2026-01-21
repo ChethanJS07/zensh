@@ -3,14 +3,26 @@ cmake-build-*/
 CMakeFiles/
 CMakeCache.txt
 Makefile
+install_manifest.txt
 
 zensh
 shell
 *.o
+*.a
+*.so
+*.out
 
 .vscode/
 .idea/
 *.swp
+*.swo
+*~
+
+.DS_Store
+Thumbs.db
 
 .zensh_history
+
+vgcore.*
+core
 
