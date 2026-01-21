@@ -20,7 +20,7 @@ int main(void) {
     read_history(histfile);
   }
 
-  history_session_start = history_length;
+  history_session_start = 0;
   atexit(save_history);
 
   while (1) {

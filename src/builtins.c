@@ -124,11 +124,12 @@ int builtin_history(int argc, char **argv) {
 
   // history -r FILE
   if (argc == 3 && strcmp(argv[1], "-r") == 0) {
+    int old_len = history_length;
     if (read_history(argv[2]) != 0) {
       perror("history");
       return 1;
     }
-    history_session_start = history_length;
+    history_session_start = old_len;
     return 0;
   }
 
