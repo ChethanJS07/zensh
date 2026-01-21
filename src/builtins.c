@@ -128,6 +128,7 @@ int builtin_history(int argc, char **argv) {
       perror("history");
       return 1;
     }
+    history_session_start = history_length;
     return 0;
   }
 
@@ -157,7 +158,13 @@ int builtin_history(int argc, char **argv) {
 
   return 0;
 }
+
 char *get_history_path(void) {
+  const char *histfile = getenv("HISTFILE");
+  if (histfile && *histfile) {
+    return strdup(histfile);
+  }
+
   const char *home = getenv("HOME");
   if (!home)
     return NULL;
