@@ -104,13 +104,18 @@ int builtin_history(int argc, char **argv) {
   // history N
   if (argc == 2 && isdigit((unsigned char)argv[1][0])) {
     int n = atoi(argv[1]);
+    HIST_ENTRY **list = history_list();
+    if (!list)
+      return 0;
+
+    int total = history_length;
     int start = total - n;
     if (start < history_session_start)
       start = history_session_start;
 
-    int num = 1;
     for (int i = start; i < total; i++) {
-      printf("%5d  %s\n", num++, list[i]->line);
+      int display_num = (i - history_session_start) + 1;
+      printf("%5d  %s\n", display_num, list[i]->line);
     }
     return 0;
   }
