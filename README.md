@@ -6,34 +6,79 @@ pipelines, redirection, quoting, and autocompletion.
 
 ---
 
+## Installation
+
+### Arch Linux (AUR)
+
+```bash
+# Using yay
+yay -S zensh
+
+# Using paru
+paru -S zensh
+```
+
+### Manual AUR installation
+
+git clone https://aur.archlinux.org/zensh.git
+cd zensh
+makepkg -si
+
+### Manual Build
+
+Dependencies:
+
+    GCC or Clang
+
+    CMake >= 3.13
+
+    GNU Readline
+
+Build steps:
+bash
+
+git clone https://github.com/ChethanJS07/zensh.git
+cd zensh
+mkdir build && cd build
+cmake ..
+make
+
+Run:
+bash
+
+./zensh
+
+---
+
 ## FEATURES
 
 ### BUILT-IN COMMANDS
 
-- **echo** : print arguments  
-- **cd** : change directory (supports `~`, relative & absolute paths)  
-- **pwd** : print working directory  
-- **type** : identify builtins or executables in `PATH`  
-- **history** : view and manage command history  
-- **clear** : clear the terminal  
-- **exit** : exit the shell  
+- **echo** : print arguments
+- **cd** : change directory (supports `~`, relative & absolute paths)
+- **pwd** : print working directory
+- **type** : identify builtins or executables in `PATH`
+- **history** : view and manage command history
+- **clear** : clear the terminal
+- **exit** : exit the shell
 
 ---
 
 ## COMMAND HISTORY (GNU READLINE)
 
-- Persistent history across sessions  
-- Arrow-key navigation  
-- Reverse search  
-- History saved automatically on exit  
-- History file configurable via `HISTFILE` environment variable  
+- Persistent history across sessions
+- Arrow-key navigation
+- Reverse search
+- History saved automatically on exit
+- History file configurable via `HISTFILE` environment variable
 
-**History commands:**  
-- `history`  
-- `history N`  
-- `history -r <file>` read & append history from file  
-- `history -w <file>` write history to file  
-- `history -a <file>` append current session to file  
+**History commands:**
+
+- `history`
+- `history N`
+- `history -r <file>` read & append history from file
+- `history -w <file>` write history to file
+- `history -a <file>` append current session to file
 
 ---
 
@@ -42,53 +87,60 @@ pipelines, redirection, quoting, and autocompletion.
 zensh supports Unix-style pipelines using the `|` operator.
 The output of one command is passed as input to the next.
 
-**Examples:**  
-- `cat file.txt | grep foo | wc -l`  
-- `printf "a\nb\n" | grep a | wc -l`  
+**Examples:**
+
+- `cat file.txt | grep foo | wc -l`
+- `printf "a\nb\n" | grep a | wc -l`
 - `type ls | wc -l`
 
-**Notes:**  
-- Each stage runs in its own process  
-- Pipes created using `pipe()`  
-- File descriptors connected using `dup2()`  
-- Invalid pipelines like `"cd | wc"` are rejected  
+**Notes:**
+
+- Each stage runs in its own process
+- Pipes created using `pipe()`
+- File descriptors connected using `dup2()`
+- Invalid pipelines like `"cd | wc"` are rejected
 
 ---
 
 ## INPUT / OUTPUT REDIRECTION
 
-**Supported operators:**  
-- `>` redirect stdout (overwrite)  
-- `>>` redirect stdout (append)  
-- `1>` explicit stdout  
-- `2>` redirect stderr  
-- `2>>` append stderr  
+**Supported operators:**
 
-**Examples:**  
-- `echo hello > out.txt`  
-- `echo world >> out.txt`  
-- `ls nonexistent 2> err.txt`  
+- `>` redirect stdout (overwrite)
+- `>>` redirect stdout (append)
+- `1>` explicit stdout
+- `2>` redirect stderr
+- `2>>` append stderr
+
+**Examples:**
+
+- `echo hello > out.txt`
+- `echo world >> out.txt`
+- `ls nonexistent 2> err.txt`
 - `ls | wc -l > count.txt`
 
-**Redirection works for:**  
-- Builtins  
-- External commands  
-- Pipeline endpoints  
+**Redirection works for:**
+
+- Builtins
+- External commands
+- Pipeline endpoints
 
 ---
 
 ## QUOTING & ESCAPING
 
-zensh correctly handles:  
-- Single quotes: `'...'`  
-- Double quotes: `"..."` (with escapes)  
-- Backslash escapes outside quotes  
-- Concatenated quoted strings  
+zensh correctly handles:
 
-**Examples:**  
-- `echo "hello""world"`  
-- `echo 'hello "world"'`  
-- `echo world\ \ test`  
+- Single quotes: `'...'`
+- Double quotes: `"..."` (with escapes)
+- Backslash escapes outside quotes
+- Concatenated quoted strings
+
+**Examples:**
+
+- `echo "hello""world"`
+- `echo 'hello "world"'`
+- `echo world\ \ test`
 - `echo raspberry\\nblueberry`
 
 Behavior closely matches Bash.
@@ -97,26 +149,29 @@ Behavior closely matches Bash.
 
 ## AUTOCOMPLETION
 
-Powered by GNU Readline:  
-- Builtin command completion  
-- Executable completion from `PATH`  
-- File and directory completion  
-- Context-aware behavior  
+Powered by GNU Readline:
 
-**Examples:**  
-- `ec<TAB>` → `echo`  
-- `ca<TAB>` → `cat`  
-- `/usr/bi<TAB>` → `/usr/bin/`  
+- Builtin command completion
+- Executable completion from `PATH`
+- File and directory completion
+- Context-aware behavior
+
+**Examples:**
+
+- `ec<TAB>` → `echo`
+- `ca<TAB>` → `cat`
+- `/usr/bi<TAB>` → `/usr/bin/`
 
 ---
 
 ## EXTERNAL COMMAND EXECUTION
 
-- Executes programs found in `PATH`  
-- Uses `fork()`, `execvp()`, and `wait()`  
-- Clear error messages for invalid commands  
+- Executes programs found in `PATH`
+- Uses `fork()`, `execvp()`, and `wait()`
+- Clear error messages for invalid commands
 
-**Example:**  
+**Example:**
+
 ```
 invalid_command: command not found
 ```
@@ -125,12 +180,14 @@ invalid_command: command not found
 
 ## BUILD INSTRUCTIONS
 
-**Dependencies:**  
-- GCC or Clang  
-- CMake >= 3.13  
-- GNU Readline  
+**Dependencies:**
 
-**Build steps:**  
+- GCC or Clang
+- CMake >= 3.13
+- GNU Readline
+
+**Build steps:**
+
 ```bash
 git clone https://github.com/ChethanJS07/zensh.git
 cd zensh
@@ -139,7 +196,8 @@ cmake ..
 make
 ```
 
-**Run:**  
+**Run:**
+
 ```bash
 ./zensh
 ```
