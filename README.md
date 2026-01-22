@@ -1,4 +1,4 @@
-zensh 🧘‍♂️
+# zensh 🧘‍♂️
 
 zensh is a small, POSIX-style Unix shell written in C.
 It is a learning project to develop a functional interactive shell with history,
