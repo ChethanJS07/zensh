@@ -20,9 +20,9 @@ paru -S zensh
 
 ### Manual AUR installation
 
-git clone https://aur.archlinux.org/zensh.git
-cd zensh
-makepkg -si
+    git clone https://aur.archlinux.org/zensh.git
+    cd zensh
+    makepkg -si
 
 ### Manual Build
 
@@ -35,18 +35,19 @@ Dependencies:
     GNU Readline
 
 Build steps:
-bash
 
+```bash
+# clone
 git clone https://github.com/ChethanJS07/zensh.git
 cd zensh
 mkdir build && cd build
 cmake ..
 make
 
+# run
 Run:
-bash
-
 ./zensh
+```
 
 ---
 
@@ -61,6 +62,7 @@ bash
 - **history** : view and manage command history
 - **clear** : clear the terminal
 - **exit** : exit the shell
+- **man** : man pages for the shell
 
 ---
 
